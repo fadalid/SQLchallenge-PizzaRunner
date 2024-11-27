@@ -1,12 +1,13 @@
 # SQLchallenge-PizzaRunner
 📍 Hi there! My name is Fer and I'm following the Case study #2 - https://8weeksqlchallenge.com/case-study-2/ by Data with Danny
 
-![PizzaRunner_logo]()
+![PizzaRunner_logo](https://github.com/fadalid/SQLchallenge-PizzaRunner/blob/main/pizza_runner_logo.png)
 
 ## Table of contents
 - [Introduction & Business Challenge](#introduction)
 - [Skills showcased](#skills-showcased)
 - [Dataset Overview](#dataset-overview)
+- [Data Wrangling](#data-wrangling)
 - [Case Study Questions & Solutions](#case-study-questions--solutions)
 - [Insights & Recommendations](#insights--recommendations)
 - [Tools & Technologies Used](#tools--technologies-used)
@@ -31,20 +32,20 @@ Danny’s goal is to fine-tune his operations by better understanding customer a
   - Presented key insights in an easily digestible format to support decision-making for operational improvements.
 
 ## Dataset Overview
-The dataset consists of 5 primary tables:
+The dataset consists of 5 tables:
 - <code>runners</code>: Details about the delivery runners (ID, registration date).
 - <code>customer_orders</code>: Orders placed by customers, including pizza type, exclusions, and extras.
 - <code>runner_orders</code>: Assignment of orders to runners, with pickup times, distances, and cancellations.
 - <code>pizza_names</code>: Names of available pizza types.
 - <code>pizza_recipes</code>: Ingredients for each pizza.
 
-This is the entity relationship diagram:
+Check the entity relationship diagram:
 ![Tables_relationship_diagram]()
 
 ### pizza_runner Database Schema
 <details>
   <summary> 
-    SQL Schema for <code>runners</code>, <code>customer_orders</code>, <code>runner_orders</code>, <code>pizza_names</code>, and <code>pizza_recipes</code> tables 
+    Creating the schema for <code>runners</code>, <code>customer_orders</code>, <code>runner_orders</code>, <code>pizza_names</code>, and <code>pizza_recipes</code> tables 
   </summary>
 
   ```SQL
@@ -176,10 +177,47 @@ This is the entity relationship diagram:
 
 </details>
 
+## Data Wrangling
+Before jumping into the analysis, I took some time to clean and normalize the data to make sure everything was consistent and ready for use. Here’s a quick rundown of what I did with the <code>customer_orders</code> and <code>runner_orders</code> tables:
+
+### Cleaning the <code>customer_orders</code> table
+- **Handled NaN Values:** Fixed any NaN values in the exclusions and extras columns, turning them into NULL for consistency.
+- **Replaced NULL with Empty Strings:** Cleaned up the exclusions and extras columns by replacing NULL values with empty strings ('').
+- **Trimmed Spaces:** Got rid of any extra commas or spaces in exclusions and extras to tidy things up.
+
+2. Cleaning the runner_orders Table
+Fixed Cancellations: Turned any NaN values in the cancellation column into NULL for consistency.
+Replaced NULL with Empty Strings: Did the same for the pickup_time, distance, and duration columns.
+-- Replacing 'NaN', 'null' and NULL values in cancellation column with an empty string
+UPDATE pizza_runner.runner_orders
+SET cancellation = ''
+WHERE cancellation = 'NaN' 
+	OR cancellation = 'null' 
+  OR cancellation IS NULL;
+
 ## Case Study Questions & Solutions
 
-### Pizza Metrics
-**- How many pizzas were ordered?**
+### Pizza Metrics 🍕
+- **How many pizzas were ordered?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    SELECT COUNT(*) AS total_pizzas 
+    FROM pizza_runner.customer_orders;
+  ```
+</details>
+
+**Output**
+| total_pizzas |
+| ------------ |
+| 14           |
+
+**Insight**: Helps us understand demand volume.
+
+- **How many unique customer orders were made?**
 <details>
   <summary>
     SQL Query
@@ -189,6 +227,497 @@ This is the entity relationship diagram:
     
   ```
 </details>
+
+**Output**
+
+
+**Insight**: 
+
+- **How many successful orders were delivered by each runner?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    WITH runner_orders_cleaned AS
+    (
+    SELECT runner_id,
+         COALESCE(NULLIF(cancellation, 'NaN'), '') AS cancellation
+    FROM pizza_runner.runner_orders
+    )
+
+  SELECT runner_id,
+         COUNT(*) AS successful_runs
+  FROM runner_orders_cleaned
+  WHERE cancellation != ''
+  GROUP BY runner_id;
+  ```
+</details>
+
+**Output**
+| runner_id | successful_runs |
+| --------- | --------------- |
+| 3         | 1               |
+| 2         | 3               |
+| 1         | 1               |
+
+**Insight**: 
+
+- ** ?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **How many of each type of pizza was delivered?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **How many Vegetarian and Meatlovers were ordered by each customer?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What was the maximum number of pizzas delivered in a single order?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **How many pizzas were delivered that had both exclusions and extras?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What was the total volume of pizzas ordered for each hour of the day?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What was the volume of orders for each day of the week?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+### Runner & Customer Experience 🚵🏻‍♀️
+
+- **How many runners signed up for each 1 week period?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **Is there any relationship between the number of pizzas and how long the order takes to prepare?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What was the average distance travelled for each customer?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What was the difference between the longest and shortest delivery times for all orders?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What was the average speed for each runner for each delivery and do you notice any trend for these values?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What is the successful delivery percentage for each runner?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+### Ingredient Optimisation 🫒
+
+- **What are the standard ingredients for each pizza?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What was the most commonly added extra?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What was the most common exclusion?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **Generate an order item for each record in the <code>customers_orders</code> table in the format of one of the following:**
+  - <code>Meat Lovers</code>
+  - <code>Meat Lovers - Exclude Beef</code>
+  - <code>Meat Lovers - Extra Bacon</code>
+  - <code>Meat Lovers - Exclude Cheese, Bacon - Extra Mushroom, Peppers</code>
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **Generate an alphabetically ordered comma separated ingredient list for each pizza order from the <code>customer_orders</code> table and add a <code>2x</code> in front of any relevant ingredients.**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+### Pricing & Ratings 📊
+
+- **If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes - how much money has Pizza Runner made so far if there are no delivery fees?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **What if there was an additional $1 charge for any pizza extras?** Add cheese is $1 extra.
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, how would you design an additional table for this new dataset - generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5.**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **Using your newly generated table - can you join all of the information together to form a table which has the following information for successful deliveries?**
+  - <code>customer_id</code>
+  - <code>order_id</code>
+  - <code>runner_id</code>
+  - <code>rating</code>
+  - <code>order_time</code>
+  - <code>pickup_time</code>
+  - Time between order and pickup
+  - Delivery duration
+  - Average speed
+  - Total number of pizzas
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+- **If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
+### Bonus Question 🎉
+
+- **If Danny wants to expand his range of pizzas - how would this impact the existing data design? Write an <code>INSERT</code> statement to demonstrate what would happen if a new <code>Supreme</code> pizza with all the toppings was added to the Pizza Runner menu?**
+<details>
+  <summary>
+    SQL Query
+  </summary>
+
+  ```SQL
+    
+  ```
+</details>
+
+**Output**
+
+
+**Insight**: 
+
 
 ## Insights & Recommendations
 
